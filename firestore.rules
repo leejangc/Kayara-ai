@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUserSettings(data, userId) {
+      return data.userId is string && data.userId == userId
+        && data.companionName is string && data.companionName.size() > 0 && data.companionName.size() <= 100
+        && (!('userName' in data) || (data.userName is string && data.userName.size() <= 100))
+        && data.relationship is string && data.relationship.size() <= 50
+        && data.gender is string && data.gender in ['female', 'male']
+        && data.languageCode is string && data.languageCode.size() > 0 && data.languageCode.size() <= 20
+        && data.autoReadReplies is bool
+        && data.model is string && data.model.size() > 0 && data.model.size() <= 100
+        && (!('personalityPreset' in data) || (data.personalityPreset is string && data.personalityPreset.size() <= 50))
+        && (!('customInstructions' in data) || (data.customInstructions is string && data.customInstructions.size() <= 1000))
+        && (!('autoMemoryEnabled' in data) || data.autoMemoryEnabled is bool);
+    }
+
+    function isValidChatMessage(data, userId) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 100
+        && data.userId is string && data.userId == userId
+        && data.role is string && data.role in ['user', 'model', 'error']
+        && data.text is string && data.text.size() <= 10000;
+    }
+
+    function isValidMemoryItem(data, userId) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 100
+        && data.userId is string && data.userId == userId
+        && data.fact is string && data.fact.size() > 0 && data.fact.size() <= 1000
+        && (!('category' in data) || (data.category is string && data.category.size() <= 50));
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserSettings(request.resource.data, userId);
+      allow delete: if isOwner(userId);
+
+      match /messages/{messageId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidChatMessage(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+
+      match /memories/{memoryId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidMemoryItem(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

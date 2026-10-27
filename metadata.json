@@ -1,0 +1,8 @@
+{
+  "name": "Remix Kayara AI",
+  "description": "Intelligent AI companion with voice calls, dynamic personalities, and personalized memory designed by Mr. Laxman Chhetri.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

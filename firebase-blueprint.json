@@ -1,0 +1,133 @@
+{
+  "entities": {
+    "UserSettings": {
+      "title": "UserSettings",
+      "description": "User preferences, companion customization and personality preset settings",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique user ID matching auth.uid"
+        },
+        "companionName": {
+          "type": "string",
+          "description": "Display name of the companion"
+        },
+        "userName": {
+          "type": "string",
+          "description": "User's preferred display name"
+        },
+        "relationship": {
+          "type": "string",
+          "description": "Relationship persona: partner, friend, mentor, rebel, zen, coach"
+        },
+        "personalityPreset": {
+          "type": "string",
+          "description": "Selected personality preset ID"
+        },
+        "customInstructions": {
+          "type": "string",
+          "description": "Custom prompt directives or personality tuning"
+        },
+        "gender": {
+          "type": "string",
+          "description": "Voice and persona gender"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "Preferred language locale code"
+        },
+        "autoReadReplies": {
+          "type": "boolean",
+          "description": "Whether AI replies are automatically read aloud"
+        },
+        "autoMemoryEnabled": {
+          "type": "boolean",
+          "description": "Whether AI automatically learns facts into memory brain"
+        },
+        "model": {
+          "type": "string",
+          "description": "Selected Gemini model identifier"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when settings were last updated"
+        }
+      },
+      "required": ["userId", "companionName", "relationship", "gender", "languageCode", "autoReadReplies", "model"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A single chat message exchange in the conversation history",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique message identifier"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of speaker: user, model, or error"
+        },
+        "text": {
+          "type": "string",
+          "description": "Body content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the message was sent"
+        }
+      },
+      "required": ["id", "userId", "role", "text"]
+    },
+    "MemoryItem": {
+      "title": "MemoryItem",
+      "description": "A remembered fact or user detail preserved in the long-term memory brain",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique memory item identifier"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID"
+        },
+        "fact": {
+          "type": "string",
+          "description": "The specific fact or preference learned about the user"
+        },
+        "category": {
+          "type": "string",
+          "description": "Memory category tag (General, Preference, Goal, Personal, Work)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the memory was stored"
+        }
+      },
+      "required": ["id", "userId", "fact"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserSettings",
+      "description": "Stores companion profile, personality preset and settings for the authenticated user"
+    },
+    "/users/{userId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Collection of chat history messages belonging to the user"
+    },
+    "/users/{userId}/memories/{memoryId}": {
+      "schema": "MemoryItem",
+      "description": "Collection of lasting memories and facts stored in the memory brain"
+    }
+  }
+}
